@@ -1,0 +1,135 @@
+*{
+  margin: 0px;
+  padding: 0px;
+  background-color: #0a0a0a;
+}
+
+
+.heading{
+  font-family: "Bungee Spice", sans-serif;
+  font-size: 1.7rem;
+  text-align: center;
+  padding: 25px;
+}
+
+h1{
+ text-shadow: 2px 2px 6px #be3600;
+ transition: text-shadow, 0.27s;
+}
+
+h1:hover{
+  text-shadow: 2px 2px 6px #be3600, 2px 2px 8px #FF5F1F;
+}
+
+li{
+  max-width: fit-content;
+  list-style: none;
+}
+
+
+a{
+  text-decoration: none;
+  color: white;
+}
+
+a:hover{
+  text-decoration: underline;
+}
+
+.teamInfo>div{
+display: flex;
+gap: 20px;
+}
+
+.teamInfo{
+  font-size: 1.2rem;
+   max-width: fit-content;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border: 3px solid #be3600;
+  box-shadow: 2px 2px 8px #be3600;
+  border-radius: 10px;
+  margin: 9px;
+  padding: 18px;
+  color: white;
+  width: auto;
+}
+
+h2{
+  padding-bottom: 10px;
+  color: #FF5F1F;
+  text-align: center;
+}
+
+.teamContainer{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.addTeamBtn{
+  font-family: 'Times New Roman', Times, serif;
+  color: white;
+  border: 3px solid #be3600;
+  box-shadow: 2px 2px 8px #be3600;
+  border-radius: 10px;
+  padding: 15px;
+  margin: 19px;
+  transition: box-shadow 0.3s ease, transform 0.2s ease; /* Smooth transition */
+}
+
+.addTeamBtn:hover{
+ box-shadow: 2px 2px 6px #be3600;
+ box-shadow: 4px 4px 15px #ff4d00, 0 0 10px #ff4d00; /* More intense, glowing shadow */
+ transform: scale(1.05); /* Slight grow effect */
+}
+
+.addTeamBtn:active{
+  background-color: #2a2a2a;
+}
+
+label{
+  color: white;
+  /* padding: 10px; */
+  padding: 0px 20px;
+
+}
+
+input{
+  padding: 5px;
+  /* background-color: white; */
+  box-shadow: 2px 2px 6px #be3600;
+  border-radius: 10px;
+  color: white;
+  border: 2px solid #ff4d00;
+}
+
+input:active{
+  box-shadow: 4px 4px 15px #ff4d00, 0 0 10px #ff4d00;
+}
+
+.addTeamForm{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border: 3px solid #be3600;
+  box-shadow: 2px 2px 8px #be3600;
+  border-radius: 10px;
+  margin-top: 15px;
+  padding: 20px;
+  gap: 15px;
+}
+
+.submitTeam{
+    font-family: 'Times New Roman', Times, serif;
+    color: white;
+    border: 3px solid #be3600;
+    box-shadow: 2px 2px 8px #be3600;
+    border-radius: 10px;
+    padding: 5px 14px;
+    margin-top: 2px;
+}
