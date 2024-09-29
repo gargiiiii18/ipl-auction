@@ -1,29 +1,28 @@
-import React, { useState, Fragment } from 'react';
+import React, { useState, Fragment, lazy, Suspense } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 // import './App.css'
 import TeamCard from './TeamCard';
 import AddTeam from './AddTeam';
-function App() {
+import PlayerCard from './PlayerCard';
+// import Team from './Team';
+import Homepage from './Homepage';
 
-  const[isClicked, setClicked] = useState(false);
+const Team = lazy(()=>import("./Team"));
 
-  function handleClick(){
-    setClicked(true);
-  }
+const App = () => {
  
   return (
-    <Fragment>
-    <div className='heading'>
-     <h1>IPL Auction</h1>
-     </div>
-     <div className="teamContainer">
-    <TeamCard/>
-    <button onClick={handleClick} className='addTeamBtn'>Add Team</button>
-    {isClicked &&
-    <AddTeam/>
-}
-    </div>
-    </Fragment>
+  <BrowserRouter>
+  <Suspense fallback={<div>Loading Team Info...</div>}>
+    <Routes>
+      <Route path='/' element={<Homepage/>}/>
+      <Route path='/teams/:team_id' element={<Team/>}/>
+      <Route path="*" element={<Navigate to="/" />} />
+    </Routes>
+    </Suspense>
+    </BrowserRouter>
   )
+
 }
 
 export default App

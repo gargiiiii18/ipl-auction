@@ -1,11 +1,12 @@
 import React from 'react'
 import {Fragment, useEffect, useState} from "react";
-import teamData from '../constants'
-import AddTeam from './AddTeam';
+import { BrowserRouter, Routes, Route, Link, useNavigate } from 'react-router-dom';
 // import { loadConfigFromFile } from 'vite'
 const TeamCard = () => {
 
   const [allTeams, setAllTeams] = useState([]);
+
+  const navigate = useNavigate();
 
   async function getTeams(){
     const url = " http://localhost:3000";
@@ -24,6 +25,11 @@ const TeamCard = () => {
     getTeams()
   }, [])
   // console.log(allTeams);
+
+  const displayTeamInfo = (team_id) =>{
+    // console.log(team_id);
+    navigate(`teams/${team_id}`);
+  }
   
 
   return (
@@ -33,7 +39,7 @@ const TeamCard = () => {
     allTeams.map((team, index)=>(
       // <Teams name={team.name} budget={team.budget}/>
       <div>
-      <a href="/"><li>{team.team_name}</li></a>
+      <li className='teamList' key={team.team_id} onClick={() => displayTeamInfo(team.team_id)}>{team.team_name}</li>
       <span>{team.team_budget}</span> 
       </div>
     ))
