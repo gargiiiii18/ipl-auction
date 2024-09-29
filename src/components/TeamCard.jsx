@@ -1,6 +1,6 @@
 import React from 'react'
 import {Fragment, useEffect, useState} from "react";
-import { BrowserRouter, Routes, Route, Link, useNavigate } from 'react-router-dom';
+import {useNavigate } from 'react-router-dom';
 // import { loadConfigFromFile } from 'vite'
 const TeamCard = () => {
 
@@ -12,9 +12,9 @@ const TeamCard = () => {
     const url = " http://localhost:3000";
     try {
       const response = await fetch(url);
-      const jsonTeams = await response.json();
-      setAllTeams(jsonTeams);
-      // console.log(jsonTeams);
+      const jsonData = await response.json();
+      setAllTeams(jsonData);
+      console.log(jsonData);
   
     } catch (error) {
       console.log(error);

@@ -20,7 +20,7 @@ const Team = (props) => {
       const response = await fetch(url);
       const jsonPlayers = await response.json();
       setPlayers(jsonPlayers);
-      console.log(jsonPlayers);
+      // console.log(jsonPlayers);
     } catch (error) {
       console.log(error);
       
