@@ -81,7 +81,9 @@ h2{
 
 .addTeamBtn{
   font-family: 'Times New Roman', Times, serif;
+  font-size: 1.2rem;
   color: white;
+  width: 20%;
   border: 3px solid #be3600;
   box-shadow: 2px 2px 8px #be3600;
   border-radius: 10px;
@@ -99,6 +101,32 @@ h2{
 }
 
 .addTeamBtn:active{
+  background-color: #2a2a2a;
+}
+
+.startAuctionBtn{
+  font-family: 'Times New Roman', Times, serif;
+  width: 20%;
+  color: white;
+  font-size: 1.2rem;
+  /* font-weight: bolder; */
+  border: 3px solid black; /* Inverted border */
+  box-shadow: 2px 2px 8px black; /* Inverted shadow */
+  background-color: #be3600; /* Background matches the border color of .addTeamBtn */
+  border-radius: 10px;
+  margin-top: 20px;
+  margin-bottom: 15px;
+  padding: 15px;
+  /* margin: 19px; */
+  transition: box-shadow 0.3s ease, transform 0.2s ease; /* Smooth transition */
+}
+
+.startAuctionBtn:hover{
+box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.5); 
+ transform: scale(1.05); 
+}
+
+.startAuctionBtn:active{
   background-color: #2a2a2a;
 }
 
