@@ -98,12 +98,13 @@ app.post("/teams/:id", async(req, res)=>{
 app.get("/teams/:id", async (req, res)=>{
     try {
         const team_id = req.params.id;
-        const team_players_obj = await db.query("SELECT player_name, team_name FROM players JOIN teams ON players.player_teamid=teams.team_id WHERE player_teamid=$1", [team_id]);
+        const team_players_obj = await db.query("SELECT * FROM players JOIN teams ON players.player_teamid=teams.team_id WHERE player_teamid=$1 ORDER BY players.player_id ASC", [team_id]);
         const team_players = team_players_obj.rows;
         if(team_players.length===0){
-            res.json("No players added.");
+            res.json([]);
         }
         else{
+            
             res.json(team_players);
         }
 
@@ -136,8 +137,11 @@ app.get("/", async (req, res)=>{
     try {
         const teams_obj = await db.query("SELECT * FROM teams ORDER BY team_id ASC");
         const teams = teams_obj.rows;
+        const players_obj = await db.query("SELECT player_name FROM players WHERE player_teamid IS NULL");
+        const players = players_obj.rows;
         // getHighestBid(1);
         res.json(teams);
+        res.json(players);
         
     } catch (error) {
         console.log(error);   
