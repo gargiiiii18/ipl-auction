@@ -133,16 +133,22 @@ app.post("/teams", async (req, res)=>{
    }
 })
 
+app.get("/currentplayer", async (req, res)=>{
+    try {
+        const current_player_obj = await db.query("SELECT * FROM players WHERE player_teamid IS NULL ORDER BY RANDOM() LIMIT 1");
+        const current_player = current_player_obj.rows;
+        res.json(current_player);
+    } catch (error) {
+        console.log(error);  
+    }
+})
+
 app.get("/", async (req, res)=>{
     try {
         const teams_obj = await db.query("SELECT * FROM teams ORDER BY team_id ASC");
         const teams = teams_obj.rows;
-        const players_obj = await db.query("SELECT player_name FROM players WHERE player_teamid IS NULL");
-        const players = players_obj.rows;
         // getHighestBid(1);
-        res.json(teams);
-        res.json(players);
-        
+        res.json(teams);   
     } catch (error) {
         console.log(error);   
     }
