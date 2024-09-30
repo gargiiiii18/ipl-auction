@@ -20,7 +20,9 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(cors());
 app.use(express.json());
 
-let current_team_id;
+let current_team_id=null;
+let current_player_id=null;
+let current_player = null;
 
 async function getHighestBid(player_id){
     const all_bids_obj = await db.query("SELECT bids FROM players_bids WHERE player_id=$1", [player_id]);
@@ -135,12 +137,23 @@ app.post("/teams", async (req, res)=>{
 
 app.get("/currentplayer", async (req, res)=>{
     try {
-        const current_player_obj = await db.query("SELECT * FROM players WHERE player_teamid IS NULL ORDER BY RANDOM() LIMIT 1");
-        const current_player = current_player_obj.rows;
+        if(!current_player){
+        const player_obj = await db.query("SELECT * FROM players WHERE player_teamid IS NULL ORDER BY RANDOM() LIMIT 1");
+        const player = player_obj.rows;
+        
+        current_player = player;
+        current_player_id = player[0].player_id;
+        }
+        
         res.json(current_player);
     } catch (error) {
         console.log(error);  
     }
+})
+
+app.post("/endauction", async (req, res)=>{
+    current_player = null;
+    res.json({message: "Auction ended. Current player set to null"});
 })
 
 app.get("/", async (req, res)=>{
