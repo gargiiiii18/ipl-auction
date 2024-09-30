@@ -14,7 +14,7 @@ const TeamCard = () => {
       const response = await fetch(url);
       const jsonData = await response.json();
       setAllTeams(jsonData);
-      console.log(jsonData);
+      // console.log(jsonData);
   
     } catch (error) {
       console.log(error);

@@ -7,15 +7,22 @@ import PlayerCard from './PlayerCard';
 const Homepage = () => {
 
   const[isClicked, setClicked] = useState(false);
-  // const[auctionStart, setAuctionStart] = useState(false);
+  const[auctionStarted, setAuctionStarted] = useState(false);
   const[buttonText, setButtonText] = useState("Add Team");
   
-  function handleClick(){
+  const handleClick = () => {
     setClicked(!isClicked);
    setButtonText(isClicked?'Add Team':'Close')
   }
 
+  const handleAuctionStart = () => {
+    setAuctionStarted(true);
+  }
 
+  const handleAuctionEnd = () => {
+    // onAuctionEnd();
+    setCurrentPlayer(null);
+  }
 
   return (
     <Fragment>
@@ -28,8 +35,8 @@ const Homepage = () => {
     {isClicked &&
     <AddTeam/>
 }
-  {!isClicked &&
-    <button className='startAuctionBtn'>Start Auction</button>
+  {!isClicked && !auctionStarted &&
+    <button className='startAuctionBtn' onClick={handleAuctionStart}>Start Auction</button>
   }
     <PlayerCard/>
     </div>
