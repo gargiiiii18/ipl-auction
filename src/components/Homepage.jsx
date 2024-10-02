@@ -1,4 +1,4 @@
-import React, {Fragment, useState} from 'react';
+import React, {Fragment, useEffect, useState} from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import TeamCard from './TeamCard';
 import AddTeam from './AddTeam';
@@ -9,6 +9,21 @@ const Homepage = () => {
   const[isClicked, setClicked] = useState(false);
   const[auctionStarted, setAuctionStarted] = useState(false);
   const[buttonText, setButtonText] = useState("Add Team");
+
+  useEffect(()=>{
+    const checkAuctionStatus = async () =>{
+    try {
+      const url = "http://localhost:3000/auctionstatus"
+      const response = await fetch(url);
+      const data = await response.json();
+      setAuctionStarted(data.auction_started);
+      console.log(data.auction_started);
+    } catch (error) {
+      console.log(error);
+    }
+    };
+    checkAuctionStatus();
+  }, [])
   
   const handleClick = () => {
     setClicked(!isClicked);
