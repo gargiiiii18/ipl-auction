@@ -1,11 +1,13 @@
 import React, {useState, useEffect} from 'react';
 import { useParams } from 'react-router-dom';
-
+import AddBid from './AddBid';
 const Team = (props) => {
 
   const [players, setPlayers] = useState([]);
   // const [isOpen, setOpen] = useState(false);
   const [playerId, setPlayerId] = useState(null);
+  const [isClicked, setClicked] = useState(false);
+  const[buttonText, setButtonText] = useState("Bid");
 
   const {team_id} = useParams();
 
@@ -30,6 +32,11 @@ const Team = (props) => {
   useEffect(()=>{
     getPlayers()
   }, [team_id]);
+
+  const handleClick = () => {
+    setClicked(!isClicked);
+    setButtonText(buttonText=="Bid" ? "Close" : "Bid");
+  }
 
   return (
     <div className="playerContainer">
@@ -59,7 +66,15 @@ const Team = (props) => {
       </ul>
       
     </div>
+
+    <div className='bid'>
+      {/* <h2 className="bidTitle">Lets start bidding.</h2> */}
+      <button className="bidBtn" onClick={handleClick}>{buttonText}</button>
     </div>
+    {isClicked &&
+    <AddBid/>
+}
+    </div>  
   )
 }
 
