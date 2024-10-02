@@ -104,7 +104,7 @@ h2{
   background-color: #2a2a2a;
 }
 
-.startAuctionBtn{
+.endAuctionBtn{
   font-family: 'Times New Roman', Times, serif;
   width: 20%;
   color: white;
@@ -121,12 +121,12 @@ h2{
   transition: box-shadow 0.3s ease, transform 0.2s ease; /* Smooth transition */
 }
 
-.startAuctionBtn:hover{
+.endAuctionBtn:hover{
 box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.5); 
  transform: scale(1.05); 
 }
 
-.startAuctionBtn:active{
+.endAuctionBtn:active{
   background-color: #2a2a2a;
 }
 
@@ -159,6 +159,7 @@ input:active{
   box-shadow: 2px 2px 8px #be3600;
   border-radius: 10px;
   margin-top: 15px;
+  margin-bottom: 15px;
   padding: 20px;
   gap: 15px;
 }
@@ -178,6 +179,22 @@ input:active{
   box-shadow: 4px 4px 15px #ff4d00, 0 0 10px #ff4d00; /* More intense, glowing shadow */
   transform: scale(1.05); /* Slight grow effect */
 }
+.submitBid{
+    font-family: 'Times New Roman', Times, serif;
+    color: white;
+    border: 3px solid #be3600;
+    box-shadow: 2px 2px 8px #be3600;
+    border-radius: 10px;
+    padding: 5px 14px;
+    margin-top: 2px;
+}
+
+.submitBid:hover{
+  box-shadow: 2px 2px 6px #be3600;
+  box-shadow: 4px 4px 15px #ff4d00, 0 0 10px #ff4d00; /* More intense, glowing shadow */
+  transform: scale(1.05); /* Slight grow effect */
+}
+
 
 .teamList:hover{
   text-decoration: underline;
@@ -242,4 +259,50 @@ input:active{
    box-shadow: 2px 2px 8px #be3600, 
    0px -10px 10px -10px #000 ;
    padding: 15px;
+}
+
+.bid{
+  padding: 22px;
+}
+
+.bidContainer{
+  display: flex;
+}
+
+.bidBtn{
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 1.2rem;
+  color: white;
+  width: 100px;
+  border: 3px solid #be3600;
+  box-shadow: 2px 2px 8px #be3600;
+  border-radius: 10px;
+  margin-top: 30px;
+  margin-bottom: 15px;
+  padding: 15px;
+  /* margin: 19px; */
+  transition: box-shadow 0.3s ease, transform 0.2s ease; /* Smooth transition */
+}
+
+.bidBtn:hover{
+ box-shadow: 2px 2px 6px #be3600;
+ box-shadow: 4px 4px 15px #ff4d00, 0 0 10px #ff4d00; /* More intense, glowing shadow */
+ transform: scale(1.05); /* Slight grow effect */
+}
+
+.bidBtn:active{
+  background-color: #2a2a2a;
+}
+.bidForm{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border: 3px solid #be3600;
+  box-shadow: 2px 2px 8px #be3600;
+  border-radius: 10px;
+  margin-top: 15px;
+  margin-bottom: 15px;
+  padding: 20px;
+  gap: 15px;
 }
