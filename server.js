@@ -20,8 +20,8 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(cors());
 app.use(express.json());
 
-let current_team_id=null;
-let current_player_id=null;
+let current_team_id = null;
+let current_player_id = null;
 let current_player = null;
 let auction_started = false;
 
@@ -155,13 +155,14 @@ app.get("/currentplayer", async (req, res)=>{
     }
 })
 
-app.post("/startauction", async (req, res)=>{
-    auction_started = true;
-    res.json({messsage: " Auction started successfully."});
-})
+// app.post("/startauction", async (req, res)=>{
+//     auction_started = true;
+//     res.json({messsage: " Auction started successfully."});
+// })
 
 app.get("/auctionstatus", async (req, res)=>{
     res.json(auction_started);
+    
 })
 
 app.post("/endauction", async (req, res)=>{
@@ -174,6 +175,7 @@ app.get("/", async (req, res)=>{
         const teams_obj = await db.query("SELECT * FROM teams ORDER BY team_id ASC");
         const teams = teams_obj.rows;
         // getHighestBid(1);
+        // auction_started = true;
         res.json(teams);   
     } catch (error) {
         console.log(error);   
