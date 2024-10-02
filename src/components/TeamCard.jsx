@@ -1,8 +1,8 @@
 import React from 'react'
 import {Fragment, useEffect, useState} from "react";
-import {useNavigate } from 'react-router-dom';
+import {useNavigate, Link} from 'react-router-dom';
 // import { loadConfigFromFile } from 'vite'
-const TeamCard = () => {
+const TeamCard = ({currentPlayer}) => {
 
   const [allTeams, setAllTeams] = useState([]);
 
@@ -27,8 +27,11 @@ const TeamCard = () => {
   // console.log(allTeams);
 
   const displayTeamInfo = (team_id) =>{
-    // console.log(team_id);
+    // console.log(team_id)>
     navigate(`teams/${team_id}`);
+    // <Link to={`/team/${team_id}`} state={{ currentPlayer }}>
+    //   {team}
+    // </Link>
   }
   
 
