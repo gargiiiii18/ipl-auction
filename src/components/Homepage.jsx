@@ -30,6 +30,7 @@ const Homepage = () => {
       const result = response.json();
       console.log(result.message);
       setAuctionStarted(false);
+      getCurrentPlayer();
     } catch (error) {
       console.log(error); 
     }
@@ -55,6 +56,11 @@ const Homepage = () => {
     try {
       const response = await fetch(url);
       const jsonData = await response.json();
+
+      if(!response.ok||jsonData.length==0){
+        throw new Error("Failed to fetch player.");
+      }
+
       setCurrentPlayer(jsonData[0]);
       // console.log(jsonData[0].player_name);
       
