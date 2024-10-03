@@ -20,7 +20,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(cors());
 app.use(express.json());
 
-let current_team_id = null;
+// let current_team_id = null;
 let current_player_id = null;
 let current_player = null;
 let auction_started = false;
@@ -69,13 +69,12 @@ app.get("/result/:id", async (req, res)=>{
 
 app.post("/teams/:id", async(req, res)=>{
     try {
-        current_team_id=req.params.id;
+        const current_team_id=req.params.id;
         // console.log(current_team_id);
        //frontend: name of player to bid in input shd be player 
-        const player_id_obj = await db.query("SELECT player_id FROM players WHERE player_name=$1", [req.body.player]);
-        const player_id = player_id_obj.rows[0].player_id
-        const bid = req.body.bid; //frontend: name of bid in input shd be bid
-        const base_price_obj = await db.query("SELECT price FROM players WHERE player_id=$1", [player_id]);
+        const bid = parseFloat(req.body.bid); //frontend: name of bid in input shd be bid
+        const base_price_obj = await db.query("SELECT price FROM players WHERE player_id=$1", [current_player_id]);
+        // console.log((base_price_obj));
         const base_price = base_price_obj.rows[0].price;
         const team_budget_obj = await db.query("SELECT team_budget FROM teams WHERE team_id=$1", [current_team_id]);
         const team_budget = team_budget_obj.rows[0].team_budget;
@@ -86,7 +85,7 @@ app.post("/teams/:id", async(req, res)=>{
             res.json("Bidding price is lesser than the base price")
         }
         else{
-            await db.query("INSERT INTO players_bids VALUES ($1, $2, $3, $4, $5)", [player_id, base_price, current_team_id, team_budget, bid]);
+            await db.query("INSERT INTO players_bids VALUES ($1, $2, $3, $4, $5)", [current_player_id, base_price, current_team_id, team_budget, bid]);
 
         }
         // console.log(player_id);
@@ -138,15 +137,16 @@ app.post("/teams", async (req, res)=>{
 
 app.get("/currentplayer", async (req, res)=>{
     try {
-        if(auction_started && current_player){
+        if(auction_started){
             return res.json(current_player);
         }
-        if(!auction_started && !current_player){
+        if(!auction_started){
         const player_obj = await db.query("SELECT * FROM players WHERE player_teamid IS NULL ORDER BY RANDOM() LIMIT 1");
         const player = player_obj.rows;
         
         current_player = player;
         current_player_id = player[0].player_id;
+        auction_started=true;
         }
         
         res.json(current_player);
@@ -155,11 +155,6 @@ app.get("/currentplayer", async (req, res)=>{
     }
 })
 
-// app.post("/startauction", async (req, res)=>{
-//     auction_started = true;
-//     res.json({messsage: " Auction started successfully."});
-// })
-
 app.get("/auctionstatus", async (req, res)=>{
     res.json(auction_started);
     
@@ -167,6 +162,7 @@ app.get("/auctionstatus", async (req, res)=>{
 
 app.post("/endauction", async (req, res)=>{
     current_player = null;
+    auction_started=false;
     res.json({message: "Auction ended. Current player set to null"});
 })
 
