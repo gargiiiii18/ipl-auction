@@ -12,18 +12,13 @@ const AddTeam = () => {
     
     function handleChange(event){
         const {name, value} = event.target;
-        // setTeamInfo(
-        //     {
-        //         [name]: value
-        //     }
-        // )
         setTeamInfo(prevTeamInfo=>{
             return {
                 ...prevTeamInfo,
                 [name]: value
             }
     })
-        console.log(teamInfo);
+        // console.log(teamInfo);
         
     }
     
@@ -43,7 +38,6 @@ const AddTeam = () => {
             }
             else{
                 console.log("Failed to add team");
-                
             }
         } catch (error) {
             console.log(error);
