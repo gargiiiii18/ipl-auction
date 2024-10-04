@@ -23,7 +23,9 @@ const handleSubmit = async (event) => {
       body: JSON.stringify(body)
     });
     console.log(response.status);
-    if(!response.ok){
+    // console.log(body);
+    if(response.ok){
+      console.log("redirecting..."); 
       window.location.href=`http://localhost:5173/${team_id}`;
     }
     else{
