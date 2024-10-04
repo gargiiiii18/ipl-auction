@@ -1,0 +1,3 @@
+changed setAuctionStarted to true in Homepage.
+lock a player only if atleast one team has sufficient funds to bid for the player.
+form validation (number for bid, etc)
