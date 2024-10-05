@@ -89,11 +89,7 @@ app.post("/teams/:id", async(req, res)=>{
         else{
             await db.query("INSERT INTO players_bids VALUES ($1, $2, $3, $4, $5)", [current_player_id, base_price, current_team_id, team_budget, bid]);
 
-        }
-        // console.log(player_id);
-        // console.log(bid);
-        // console.log(base_price);
-        // console.log(team_budget);   
+        }  
     } catch (error) {
         console.log(error);
     }
