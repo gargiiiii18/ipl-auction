@@ -1,10 +1,11 @@
 import React, {useState} from 'react'
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 const AddBid = () => {
 
 const [bid, setBid]  = useState(""); 
 
 const {team_id} = useParams();
+const {navigate} = useNavigate();
 
 const handleChange = (event) => {
     setBid(event.target.value);
@@ -26,7 +27,8 @@ const handleSubmit = async (event) => {
     // console.log(body);
     if(response.ok){
       console.log("redirecting..."); 
-      window.location.href=`http://localhost:5173/${team_id}`;
+      // window.location.href=`http://localhost:5173/${team_id}`;
+      navigate(`/teams/${team_idm}`);
     }
     else{
       console.log("Failed to add bid");
