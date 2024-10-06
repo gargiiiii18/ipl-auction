@@ -70,26 +70,25 @@ app.get("/result/:id", async (req, res)=>{
 app.post("/teams/:id", async(req, res)=>{
     try {
         const current_team_id=req.params.id;
-        // console.log(current_player_id); http://localhost:5173/
-        // console.log(current_team_id);
-       //frontend: name of player to bid in input shd be player 
-        const bid = parseFloat(req.body.bid); //frontend: name of bid in input shd be bid
-        const base_price_obj = await db.query("SELECT price FROM players WHERE player_id=$1", [current_player_id]);
-        // console.log((base_price_obj));
-        const base_price = base_price_obj.rows[0].price;
-        // console.log(base_price);
         const team_budget_obj = await db.query("SELECT team_budget FROM teams WHERE team_id=$1", [current_team_id]);
         const team_budget = team_budget_obj.rows[0].team_budget;
+       //frontend: name of player to bid in input shd be player 
+        const base_price_obj = await db.query("SELECT price FROM players WHERE player_id=$1", [current_player_id]);
+        const base_price = base_price_obj.rows[0].price;
+        // console.log(base_price);
         if(parseFloat(team_budget)<=parseFloat(base_price)){
             res.json({status: "error", message: "Not enough budget to bid for this player."});
         }
-        else if(parseFloat(bid)<=parseFloat(base_price)){
+        else{
+        const bid = parseFloat(req.body.bid); //frontend: name of bid in input shd be bid
+        if(parseFloat(bid)<=parseFloat(base_price)){
             res.json({status: "error", message: "Bidding price is lesser than the base price."});
         }
         else{
             await db.query("INSERT INTO players_bids VALUES ($1, $2, $3, $4, $5)", [current_player_id, base_price, current_team_id, team_budget, bid]);
             res.json({status: "success", message: "Bid successfully added."});
         }  
+    }
     } catch (error) {
         console.log(error);
     }
