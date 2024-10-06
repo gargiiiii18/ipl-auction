@@ -9,6 +9,10 @@ const Team = (props) => {
   const [isClicked, setClicked] = useState(false);
   const[buttonText, setButtonText] = useState("Bid");
 
+    //states controlling AddBid
+    const [message, setMessage] = useState("");
+    const [showBid, setShowBid] = useState(true);
+
   const {team_id} = useParams();
 
   const toggleDropdown = (playerId) => {
@@ -36,6 +40,16 @@ const Team = (props) => {
   const handleClick = () => {
     setClicked(!isClicked);
     setButtonText(buttonText=="Bid" ? "Close" : "Bid");
+  }
+
+  const handleBidResponse = (status, msg) => {
+    if(status==="error"){
+      setShowBid(false);
+    }
+    else if(status==="success"){
+      setShowBid(true);
+    }
+    setMessage(msg);
   }
 
   return (
@@ -71,8 +85,9 @@ const Team = (props) => {
       {/* <h2 className="bidTitle">Lets start bidding.</h2> */}
       <button className="bidBtn" onClick={handleClick}>{buttonText}</button>
     </div>
-    {isClicked &&
-    <AddBid/>
+    {(isClicked && showBid) ?
+    <AddBid onBidResponse = {handleBidResponse}/> :
+    <h2>{message}</h2>
 }
     </div>  
   )
