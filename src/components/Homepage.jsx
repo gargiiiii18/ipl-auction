@@ -11,10 +11,6 @@ const Homepage = () => {
   const[buttonText, setButtonText] = useState("Add Team");
   const[currentPlayer, setCurrentPlayer] = useState(null);
   const[currentPlayerId, setCurrentPlayerId] = useState(null);
-  //states controlling AddBid
-  const [message, setMessage] = useState("");
-  const [showBid, setShowBid] = useState(true);
-
 
   const onAuctionEnd = async () => {
     // console.log("i have been summoned");
