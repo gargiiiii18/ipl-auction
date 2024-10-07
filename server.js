@@ -75,7 +75,6 @@ app.post("/teams/:id", async(req, res)=>{
        //frontend: name of player to bid in input shd be player 
         const base_price_obj = await db.query("SELECT price FROM players WHERE player_id=$1", [current_player_id]);
         const base_price = base_price_obj.rows[0].price;
-        // console.log(base_price);
         if(parseFloat(team_budget)<=parseFloat(base_price)){
             res.json({status: "error", message: "Not enough budget to bid for this player."});
         }
