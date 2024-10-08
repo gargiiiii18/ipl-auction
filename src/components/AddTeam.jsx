@@ -18,7 +18,7 @@ const AddTeam = () => {
                 [name]: value
             }
     })
-        // console.log(teamInfo);
+
         
     }
     
