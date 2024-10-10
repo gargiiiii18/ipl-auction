@@ -1,6 +1,5 @@
 import React, { useState, Fragment, lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
-// import './App.css'
 import TeamCard from './TeamCard';
 import AddTeam from './AddTeam';
 import PlayerCard from './PlayerCard';
