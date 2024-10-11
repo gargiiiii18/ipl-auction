@@ -13,7 +13,6 @@ const Homepage = () => {
   const[currentPlayerId, setCurrentPlayerId] = useState(null);
 
   const onAuctionEnd = async () => {
-    // console.log("i have been summoned");
     
     try {
       const url = "http://localhost:3000/endauction"
