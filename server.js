@@ -39,6 +39,26 @@ async function getHighestBid(player_id){
     
 }
 
+async function checkCanBid(player_id){
+    try {
+        const base_price_obj = await db.query("SELECT price FROM players WHERE player_id=$1", [player_id]);
+        const base_price = base_price_obj[0].rows;
+        const teams_obj = await db.query("SELECT team_budget FROM teams");
+        const teams = teams_obj.rows;
+        // console.log(team_budget);
+        for(let team of teams){
+            if(parseFloat(team.team_budget)>parseFloat(base_price)){
+                return true;
+            }
+        }
+        return false;
+        
+    } catch (error) {
+        console.log(error);
+        return false;
+    }
+}
+
 app.get("/result/:id", async (req, res)=>{
     try {
        const player_id = req.params.id;
@@ -131,15 +151,46 @@ app.post("/teams", async (req, res)=>{
    }
 })
 
+// app.get("/currentplayer", async (req, res)=>{
+//     try {
+//         if(auction_started){
+//             return res.json(current_player);
+//         }
+//         if(!auction_started){
+//         const player_obj = await db.query("SELECT * FROM players WHERE player_teamid IS NULL ORDER BY RANDOM() LIMIT 1");
+//         const player = player_obj.rows;
+
+        
+        
+//         current_player = player;
+//         current_player_id = player[0].player_id;
+//         // console.log(current_player_id);
+        
+//         auction_started=true;
+//         }
+        
+//         res.json(current_player);
+//     } catch (error) {
+//         console.log(error);  
+//     }
+// })
+
 app.get("/currentplayer", async (req, res)=>{
     try {
         if(auction_started){
             return res.json(current_player);
         }
         if(!auction_started){
-        const player_obj = await db.query("SELECT * FROM players WHERE player_teamid IS NULL ORDER BY RANDOM() LIMIT 1");
-        const player = player_obj.rows;
         
+        let player = null;
+        let sufficientFunds = false;
+
+        while(!sufficientFunds){
+        const player_obj = await db.query("SELECT * FROM players WHERE player_teamid IS NULL ORDER BY RANDOM() LIMIT 1");
+        player = player_obj.rows;
+        sufficientFunds = await checkCanBid(player.player_id);
+        }
+
         current_player = player;
         current_player_id = player[0].player_id;
         // console.log(current_player_id);
