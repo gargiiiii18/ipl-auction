@@ -5,6 +5,7 @@ const AddBid = ({team_id, onBidResponse, message}) => {
 const [bid, setBid]  = useState(""); 
 
 const navigate = useNavigate();
+// const team_id = useParams();
 
 const handleChange = (event) => {
     setBid(event.target.value);
@@ -46,7 +47,7 @@ const handleSubmit = async (event) => {
        }
        <form className='bidForm' action="">
         <label htmlFor="bid">Bid</label>
-        <input type="text" value={bid} onChange={handleChange}/>
+        <input type='text' value={bid} onChange={handleChange}/>
         <button className='submitBid' onClick={handleSubmit}>Done</button>
        </form>
     </div>
