@@ -20,7 +20,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(cors());
 app.use(express.json());
 
-// let current_team_id = null;
+let current_team_id = null;
 let current_player_id = null;
 let current_player = null;
 let auction_started = false;
@@ -42,7 +42,9 @@ async function getHighestBid(player_id){
 async function checkCanBid(player_id){
     try {
         const base_price_obj = await db.query("SELECT price FROM players WHERE player_id=$1", [player_id]);
-        const base_price = base_price_obj[0].rows;
+        const base_price = base_price_obj.rows[0].price;
+        console.log(base_price);
+        
         const teams_obj = await db.query("SELECT team_budget FROM teams");
         const teams = teams_obj.rows;
         // console.log(team_budget);
@@ -90,8 +92,11 @@ app.get("/result/:id", async (req, res)=>{
 app.post("/teams/:id", async(req, res)=>{
     try {
         const current_team_id=req.params.id;
+        console.log(current_team_id);
         const team_budget_obj = await db.query("SELECT team_budget FROM teams WHERE team_id=$1", [current_team_id]);
         const team_budget = team_budget_obj.rows[0].team_budget;
+        // console.log(current_player_id);
+        
        //frontend: name of player to bid in input shd be player 
         const base_price_obj = await db.query("SELECT price FROM players WHERE player_id=$1", [current_player_id]);
         const base_price = base_price_obj.rows[0].price;
@@ -100,6 +105,8 @@ app.post("/teams/:id", async(req, res)=>{
         }
         else{
         const bid = parseFloat(req.body.bid); //frontend: name of bid in input shd be bid
+        // console.log(bid);
+        
         if(parseFloat(bid)<=parseFloat(base_price)){
             res.json({status: "error", message: "Bidding price is lesser than the base price."});
         }
@@ -151,46 +158,17 @@ app.post("/teams", async (req, res)=>{
    }
 })
 
-// app.get("/currentplayer", async (req, res)=>{
-//     try {
-//         if(auction_started){
-//             return res.json(current_player);
-//         }
-//         if(!auction_started){
-//         const player_obj = await db.query("SELECT * FROM players WHERE player_teamid IS NULL ORDER BY RANDOM() LIMIT 1");
-//         const player = player_obj.rows;
-
-        
-        
-//         current_player = player;
-//         current_player_id = player[0].player_id;
-//         // console.log(current_player_id);
-        
-//         auction_started=true;
-//         }
-        
-//         res.json(current_player);
-//     } catch (error) {
-//         console.log(error);  
-//     }
-// })
-
 app.get("/currentplayer", async (req, res)=>{
     try {
         if(auction_started){
             return res.json(current_player);
         }
         if(!auction_started){
-        
-        let player = null;
-        let sufficientFunds = false;
-
-        while(!sufficientFunds){
         const player_obj = await db.query("SELECT * FROM players WHERE player_teamid IS NULL ORDER BY RANDOM() LIMIT 1");
-        player = player_obj.rows;
-        sufficientFunds = await checkCanBid(player.player_id);
-        }
+        const player = player_obj.rows;
 
+        
+        
         current_player = player;
         current_player_id = player[0].player_id;
         // console.log(current_player_id);
@@ -203,6 +181,35 @@ app.get("/currentplayer", async (req, res)=>{
         console.log(error);  
     }
 })
+
+// app.get("/currentplayer", async (req, res)=>{
+//     try {
+//         if(auction_started){
+//             return res.json(current_player);
+//         }
+//         if(!auction_started){
+        
+//         let player = null;
+//         let sufficientFunds = false;
+
+//         while(!sufficientFunds){
+//         const player_obj = await db.query("SELECT * FROM players WHERE player_teamid IS NULL ORDER BY RANDOM() LIMIT 1");
+//         player = player_obj.rows[0];
+//         sufficientFunds = await checkCanBid(player.player_id);
+//         }
+
+//         current_player = player;
+//         current_player_id = player.player_id;
+//         // console.log(current_player_id);
+        
+//         auction_started=true;
+//         }
+        
+//         res.json(current_player);
+//     } catch (error) {
+//         console.log(error);  
+//     }
+// })
 
 app.get("/auctionstatus", async (req, res)=>{
     res.json(auction_started);
