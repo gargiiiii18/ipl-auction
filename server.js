@@ -92,7 +92,7 @@ app.get("/result/:id", async (req, res)=>{
 app.post("/teams/:id", async(req, res)=>{
     try {
         const current_team_id=req.params.id;
-        console.log(current_team_id);
+        // console.log(current_team_id);
         const team_budget_obj = await db.query("SELECT team_budget FROM teams WHERE team_id=$1", [current_team_id]);
         const team_budget = team_budget_obj.rows[0].team_budget;
         // console.log(current_player_id);
@@ -104,8 +104,8 @@ app.post("/teams/:id", async(req, res)=>{
             res.json({status: "error", message: "Not enough budget to bid for this player."});
         }
         else{
-        const bid = parseFloat(req.body.bid); //frontend: name of bid in input shd be bid
-        // console.log(bid);
+        const bid = req.body.bid; //frontend: name of bid in input shd be bid
+        console.log(bid);
         
         if(parseFloat(bid)<=parseFloat(base_price)){
             res.json({status: "error", message: "Bidding price is lesser than the base price."});
@@ -166,12 +166,9 @@ app.get("/currentplayer", async (req, res)=>{
         if(!auction_started){
         const player_obj = await db.query("SELECT * FROM players WHERE player_teamid IS NULL ORDER BY RANDOM() LIMIT 1");
         const player = player_obj.rows;
-
-        
-        
         current_player = player;
         current_player_id = player[0].player_id;
-        // console.log(current_player_id);
+        console.log(current_player_id);
         
         auction_started=true;
         }
