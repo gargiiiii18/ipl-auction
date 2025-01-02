@@ -25,6 +25,10 @@ let current_player_id = null;
 let current_player = null;
 let auction_started = false;
 
+async function getCurrentPlayer(){
+
+}
+
 async function getHighestBid(player_id){
     const all_bids_obj = await db.query("SELECT bids FROM players_bids WHERE player_id=$1", [player_id]);
     const all_bids = all_bids_obj.rows;
@@ -98,14 +102,17 @@ app.post("/teams/:id", async(req, res)=>{
         // console.log(current_player_id);
         
        //frontend: name of player to bid in input shd be player 
-        const base_price_obj = await db.query("SELECT price FROM players WHERE player_id=$1", [current_player_id]);
+        const base_price_obj = await db.query("SELECT * FROM players WHERE player_id=$1", [current_player_id]);
+        // console.log(base_price_obj);
+        
         const base_price = base_price_obj.rows[0].price;
         if(parseFloat(team_budget)<=parseFloat(base_price)){
+
             res.json({status: "error", message: "Not enough budget to bid for this player."});
         }
         else{
         const bid = req.body.bid; //frontend: name of bid in input shd be bid
-        console.log(bid);
+        // console.log(bid);
         
         if(parseFloat(bid)<=parseFloat(base_price)){
             res.json({status: "error", message: "Bidding price is lesser than the base price."});
@@ -123,13 +130,13 @@ app.post("/teams/:id", async(req, res)=>{
 app.get("/teams/:id", async (req, res)=>{
     try {
         const team_id = req.params.id;
+        // console.log(team_id);
         const team_players_obj = await db.query("SELECT * FROM players JOIN teams ON players.player_teamid=teams.team_id WHERE player_teamid=$1 ORDER BY players.player_id ASC", [team_id]);
         const team_players = team_players_obj.rows;
         if(team_players.length===0){
             res.json([]);
         }
-        else{
-            
+        else{ 
             res.json(team_players);
         }
 
@@ -168,7 +175,7 @@ app.get("/currentplayer", async (req, res)=>{
         const player = player_obj.rows;
         current_player = player;
         current_player_id = player[0].player_id;
-        console.log(current_player_id);
+        // console.log(current_player_id);
         
         auction_started=true;
         }
