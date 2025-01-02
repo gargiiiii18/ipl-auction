@@ -20,6 +20,44 @@ const Team = (props) => {
     // playerId===null&&setOpen(true)
   }
 
+  const checkIfCanBid = async (playerId) => {
+    const url = `http://localhost:3000/teams/${team_id}`; // Endpoint to check if the team can bid
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ player_id: playerId, team_id }) // Send player_id and team_id to check if bid is possible
+      });
+
+      const data = await response.json();
+      console.log(data.status);
+      if (data.status === "error") {
+        setShowBid(false); // Hide the Bid button if the team cannot afford to bid
+        setMessage(data.message || "Insufficient budget to place bid.");
+      } else if (data.status === "success") {
+        setShowBid(true); // Show the Bid button if the team can afford the bid
+        setMessage("You can place a bid.");
+      }
+    } catch(error){
+      console.log(error);
+
+    }
+    }   
+
+
+    const handleBidResponse = (status, msg) => {
+    // console.log(status);
+
+    // if(status==="error"){
+    //   setShowBid(false);
+    // }
+    // else if(status==="success"){
+    //   setShowBid(false);
+    // }
+    setShowBid(false);
+    setMessage(msg);
+  }
+
   async function getPlayers(){
     const url = `http://localhost:3000/teams/${team_id}`;
     try {
@@ -40,16 +78,6 @@ const Team = (props) => {
   const handleClick = () => {
     setClicked(!isClicked);
     setButtonText(buttonText=="Bid" ? "Close" : "Bid");
-  }
-
-  const handleBidResponse = (status, msg) => {
-    if(status==="error"){
-      setShowBid(false);
-    }
-    else if(status==="success"){
-      setShowBid(true);
-    }
-    setMessage(msg);
   }
 
   return (
@@ -83,11 +111,14 @@ const Team = (props) => {
 
     <div className='bid'>
       {/* <h2 className="bidTitle">Lets start bidding.</h2> */}
-      <button className="bidBtn" onClick={handleClick}>{buttonText}</button>
+      {checkIfCanBid(playerId) && showBid ?
+      <button className="bidBtn" onClick={handleClick}>{buttonText}</button> :
+      <h2>{message}</h2>
+}
     </div>
     {(isClicked && showBid) ?
     <AddBid onBidResponse = {handleBidResponse}/> :
-    <h2>{message}</h2>
+   <h2></h2>
 }
     </div>  
   )
