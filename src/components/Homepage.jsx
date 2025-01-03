@@ -27,7 +27,7 @@ const Homepage = () => {
       }
 
       const result = response.json();
-      console.log(result.message);
+      // console.log(result.message);
       setAuctionStarted(false);
       getCurrentPlayer();
     } catch (error) {
