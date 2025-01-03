@@ -21,7 +21,7 @@ const Team = (props) => {
   }
 
   const checkIfCanBid = async (playerId) => {
-    const url = `http://localhost:3000/teams/${team_id}`; // Endpoint to check if the team can bid
+    const url = `http://localhost:3000/teams/${team_id}/check`; // Endpoint to check if the team can bid
     try {
       const response = await fetch(url, {
         method: 'POST',
@@ -30,13 +30,13 @@ const Team = (props) => {
       });
 
       const data = await response.json();
-      console.log(data.status);
+      // console.log(data.status);
       if (data.status === "error") {
         setShowBid(false); // Hide the Bid button if the team cannot afford to bid
         setMessage(data.message || "Insufficient budget to place bid.");
       } else if (data.status === "success") {
-        setShowBid(true); // Show the Bid button if the team can afford the bid
-        setMessage("You can place a bid.");
+        // setShowBid(true); // Show the Bid button if the team can afford the bid
+        setMessage(data.message);
       }
     } catch(error){
       console.log(error);
@@ -113,12 +113,12 @@ const Team = (props) => {
       {/* <h2 className="bidTitle">Lets start bidding.</h2> */}
       {checkIfCanBid(playerId) && showBid ?
       <button className="bidBtn" onClick={handleClick}>{buttonText}</button> :
-      <h2>{message}</h2>
+      null
 }
     </div>
-    {(isClicked && showBid) ?
-    <AddBid onBidResponse = {handleBidResponse}/> :
-   <h2></h2>
+    {(isClicked) ?
+    <AddBid onBidResponse = {handleBidResponse} message={message}/> :
+   <h2>{message}</h2>
 }
     </div>  
   )
