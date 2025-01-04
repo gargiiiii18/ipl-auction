@@ -4,6 +4,7 @@ const AddBid = ({showBid, onBidResponse, message}) => {
 
 const [bid, setBid]  = useState(""); 
 const [enoughBudgetMsg, setEnoughBudgetMsg] = useState("");
+const[bidPlaced, setBidPlaced] = useState(false);
 
 const navigate = useNavigate();
 const team_id_obj = useParams();
@@ -48,6 +49,7 @@ const handleSubmit = async (event) => {
       setEnoughBudgetMsg(data.message);
       navigate(`/teams/${team_id}`);
       setBid("");
+      // setShowBidForm(false);
     }
   } catch (error) {
     console.log(error);
