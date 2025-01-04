@@ -12,6 +12,7 @@ const Team = (props) => {
     //states controlling AddBid
     const [message, setMessage] = useState("");
     const [showBid, setShowBid] = useState(true);
+    // const[bidPlaced, setBidPlaced] = useState(false);
 
   const {team_id} = useParams();
 
