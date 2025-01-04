@@ -2,16 +2,17 @@ import express from "express";
 import bodyParser from "body-parser";
 import pg from "pg";
 import cors from "cors";
-
+import dotenv from "dotenv";
+dotenv.config();
 const app = express();
 const port = 3000;
 
 const db = new pg.Client({
-    user: "postgres",
-    host: "localhost",
-    database: "ipl_auction",
-    password: "Gargi18112004",
-    port: 5432,
+    user: process.env.DB_USER,
+    host: process.env.DB_HOST,
+    database: process.env.DB_NAME,
+    password: process.env.DB_PASSWORD,
+    port: process.env.DB_PORT,
 });
 db.connect();
 
@@ -100,7 +101,10 @@ app.post("/teams/:id/check", async(req, res) => {
         const team_budget_obj = await db.query("SELECT team_budget FROM teams WHERE team_id=$1", [current_team_id]);
         const team_budget = team_budget_obj.rows[0].team_budget;
         // console.log(current_player_id);
-        
+        const existingBid = await db.query("SELECT * FROM players_bids WHERE team_id=$1 AND player_id=$2", [current_team_id, current_player_id]);
+        if(existingBid.rows.length>0){
+            res.json({status: "error", message: "You have already placed a bid for this player"});
+        }
        //frontend: name of player to bid in input shd be player 
         const base_price_obj = await db.query("SELECT * FROM players WHERE player_id=$1", [current_player_id]);
         // console.log(base_price_obj);
@@ -140,7 +144,7 @@ app.post("/teams/:id", async(req, res)=>{
         // console.log(bid);
         
         if(parseFloat(bid)<=parseFloat(base_price)){
-            res.json({status: "error", message: "Bidding price is lesser than the base price."});
+            res.json({status: "error", message: "Bidding price is lesser than the player's base price."});
         }
         else{
             await db.query("INSERT INTO players_bids VALUES ($1, $2, $3, $4, $5)", [current_player_id, base_price, current_team_id, team_budget, bid]);
