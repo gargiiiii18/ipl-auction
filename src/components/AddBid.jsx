@@ -49,7 +49,7 @@ const handleSubmit = async (event) => {
       setEnoughBudgetMsg(data.message);
       navigate(`/teams/${team_id}`);
       setBid("");
-      // setShowBidForm(false);
+      setBidPlaced(true);
     }
   } catch (error) {
     console.log(error);
@@ -61,11 +61,13 @@ const handleSubmit = async (event) => {
     <div>
        {/* <h2>Current Player: {currentPlayer}</h2> */}
        <h2>{enoughBudgetMsg}</h2>
+       {!bidPlaced && 
        <form className='bidForm' action="">
         <label htmlFor="bid">Bid</label>
         <input type='number' value={bid} onChange={handleChange}/>
         <button className='submitBid' onClick={handleSubmit}>Done</button>
        </form>
+}
     </div>
   )
 }
