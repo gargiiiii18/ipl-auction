@@ -88,14 +88,19 @@ const Homepage = () => {
      </div>
      <div className="teamContainer">
     <TeamCard currentPlayer={currentPlayer}/>
+    <div className="buttons">
     <button onClick={handleClick} className='addTeamBtn'>{buttonText}</button>
-    {isClicked &&
-    <AddTeam/>
-}
+
   {!isClicked && !auctionStarted &&
     <button className='endAuctionBtn' onClick={onAuctionEnd}>Get Player</button>
   }
+  </div>
+  {!isClicked &&
     <PlayerCard currentPlayer={currentPlayer} auctionStarted={auctionStarted} />
+  }
+      {isClicked &&
+    <AddTeam/>
+}
     </div>
     </Fragment>
   )
