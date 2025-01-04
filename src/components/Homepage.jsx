@@ -3,6 +3,7 @@ import { BrowserRouter } from 'react-router-dom';
 import TeamCard from './TeamCard';
 import AddTeam from './AddTeam';
 import PlayerCard from './PlayerCard';
+import WinnerCalculate from './WinnerCalculate';
 
 const Homepage = () => {
 
@@ -100,8 +101,11 @@ const Homepage = () => {
   }
       {isClicked &&
     <AddTeam/>
+}{!isClicked && !auctionStarted &&
+<WinnerCalculate/>
 }
     </div>
+  
     </Fragment>
   )
 }
