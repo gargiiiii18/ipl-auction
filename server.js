@@ -95,6 +95,7 @@ app.get("/result/:id", async (req, res)=>{
         await db.query("UPDATE players SET player_teamid=$1 WHERE player_id=$2", [winning_team_id, player_id]);
         // res.json(`${winning_team} wins the bid for price ${player_price}`);
         res.json({status: 'success', data: winning_team});
+        auction_started = false;
     }
 
     } catch (error) {
@@ -138,6 +139,7 @@ app.post("/teams/:id", async(req, res)=>{
         const team_budget_obj = await db.query("SELECT team_budget FROM teams WHERE team_id=$1", [current_team_id]);
         const team_budget = team_budget_obj.rows[0].team_budget;
         // console.log(current_player_id);
+        // console.log(team_budget);
         
        //frontend: name of player to bid in input shd be player 
         const base_price_obj = await db.query("SELECT * FROM players WHERE player_id=$1", [current_player_id]);
@@ -145,7 +147,8 @@ app.post("/teams/:id", async(req, res)=>{
         
         const base_price = base_price_obj.rows[0].price;
         // if(parseFloat(team_budget)<=parseFloat(base_price)){
-
+        // console.log(base_price);
+        
         //     res.json({status: "error", message: "Not enough budget to bid for this player."});
         // }
        
@@ -154,6 +157,9 @@ app.post("/teams/:id", async(req, res)=>{
         
         if(parseFloat(bid)<=parseFloat(base_price)){
             res.json({status: "error", message: "Bidding price is lesser than the player's base price."});
+        }
+        else if(team_budget-bid < 0){
+            res.json({status: "error", message: "Bid is out of your team budget"});
         }
         else{
             await db.query("INSERT INTO players_bids VALUES ($1, $2, $3, $4, $5)", [current_player_id, base_price, current_team_id, team_budget, bid]);
