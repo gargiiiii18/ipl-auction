@@ -45,7 +45,6 @@ const Team = (props) => {
     }
     }   
 
-
     const handleBidResponse = (status, msg) => {
     // console.log(status);
 
