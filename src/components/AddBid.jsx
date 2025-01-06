@@ -50,6 +50,7 @@ const handleSubmit = async (event) => {
       navigate(`/teams/${team_id}`);
       setBid("");
       setBidPlaced(true);
+      window.history.replaceState(null, '', '/');
     }
   } catch (error) {
     console.log(error);
