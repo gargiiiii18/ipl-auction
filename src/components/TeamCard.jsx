@@ -23,7 +23,7 @@ const TeamCard = ({currentPlayer}) => {
 
   useEffect(()=>{
     getTeams()
-  }, [])
+  }, [allTeams, currentPlayer])
   // console.log(allTeams);
 
   const displayTeamInfo = (team_id) =>{
