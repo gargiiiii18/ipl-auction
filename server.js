@@ -70,14 +70,20 @@ app.get("/result/:id", async (req, res)=>{
     try {
        const player_id = req.params.id;
     //    console.log(player_id);
-       
+       const no_of_bids = await db.query("SELECT player_id FROM players_bids WHERE player_id=$1", [player_id]);
+       if(no_of_bids.rows.length==0){
+        // console.log(("no bids placed for this player"));
+        
+        res.json({status: 'error', message: "No bids entered for this player"});
+       }
+       else{
         const result = await getHighestBid(player_id);
         // console.log(result);
         const winning_team_id_obj = await db.query("SELECT team_id FROM players_bids WHERE bids=$1", [result]);
         const winning_team_id = winning_team_id_obj.rows[0].team_id;
         // console.log(winning_team_id);
-        const winning_team_obj = await db.query("SELECT team_name FROM teams WHERE team_id = $1", [winning_team_id]);
-        const winning_team = winning_team_obj.rows[0].team_name;
+        const winning_team_obj = await db.query("SELECT * FROM teams WHERE team_id = $1", [winning_team_id]);
+        const winning_team = winning_team_obj.rows;
         // console.log(winning_team);
         const player_price = await getHighestBid(player_id);
         // console.log(player_price);
@@ -86,7 +92,10 @@ app.get("/result/:id", async (req, res)=>{
         new_team_budget = parseFloat(parseFloat(new_team_budget)-parseFloat(player_price));
         // console.log(new_team_budget);
         await db.query("UPDATE teams SET team_budget=$1 WHERE team_id = $2", [new_team_budget, winning_team_id]);
-        res.json(`${winning_team} wins the bid`);
+        await db.query("UPDATE players SET player_teamid=$1 WHERE player_id=$2", [winning_team_id, player_id]);
+        // res.json(`${winning_team} wins the bid for price ${player_price}`);
+        res.json({status: 'success', data: winning_team});
+    }
 
     } catch (error) {
         console.log(error);
