@@ -97,6 +97,14 @@ h2{
   padding: 20px;
 }
 
+.playerPrice{
+  padding-bottom: 10px;
+  color: #FF5F1F;
+  text-align: center;
+  /* padding: 20px; */
+  /* padding-top: 2px; */
+}
+
 .teamContainer{
   display: flex;
   flex-direction: column;
