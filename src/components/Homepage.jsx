@@ -75,7 +75,7 @@ const Homepage = () => {
     if(!auctionStarted){
     getCurrentPlayer();
     }
-  }, [auctionStarted]);
+  }, [auctionStarted, currentPlayer]);
 
   const handleClick = () => {
     setClicked(!isClicked);
