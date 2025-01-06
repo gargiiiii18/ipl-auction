@@ -4,7 +4,6 @@
   background-color: #0a0a0a;
 }
 
-
 .heading{
   font-family: "Bungee Spice", sans-serif;
   font-size: 1.7rem;
@@ -57,6 +56,32 @@ gap: 20px;
   padding: 18px;
   color: white;
   width: auto;
+}
+
+.wrapper{
+  display: flex;
+  height: 100vh;
+  justify-content: center;
+  align-items: center;
+}
+
+
+.resultContainer{
+  /* box-sizing: border-box; */
+ border: 3px solid #be3600;
+ box-shadow: 2px 2px 8px #be3600;
+ border-radius: 10px;
+ display: flex;
+ flex-direction: column;
+ gap: 10px;
+ justify-content: center;
+ align-items: center;
+ max-width: fit-content;
+ height: 20vh;
+ margin: 9px;
+ padding: 18px;
+ color: white;
+ width: auto;
 }
 
 h2{
