@@ -12,7 +12,7 @@ const navigate = useNavigate();
       const current_player = await response.json();
       if(current_player && current_player.length>0){
         const player_id = current_player[0].player_id;
-        console.log(player_id);
+        // console.log(player_id);
         navigate(`result/${player_id}`);
       }
      else{
