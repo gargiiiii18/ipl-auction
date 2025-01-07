@@ -4,39 +4,37 @@ import AddBid from './AddBid';
 const Team = (props) => {
 
   const [players, setPlayers] = useState([]);
-  // const [isOpen, setOpen] = useState(false);
   const [playerId, setPlayerId] = useState(null);
+  const[teamName, setTeamName] = useState("");
+  const[teamBudget, setTeamBudget] = useState(null);
   const [isClicked, setClicked] = useState(false);
   const[buttonText, setButtonText] = useState("Bid");
 
     //states controlling AddBid
     const [message, setMessage] = useState("");
     const [showBid, setShowBid] = useState(true);
-    // const[bidPlaced, setBidPlaced] = useState(false);
 
   const {team_id} = useParams();
 
   const toggleDropdown = (playerId) => {
     setPlayerId((prev)=>playerId===prev?null:playerId)
-    // playerId===null&&setOpen(true)
   }
 
   const checkIfCanBid = async (playerId) => {
-    const url = `http://localhost:3000/teams/${team_id}/check`; // Endpoint to check if the team can bid
+    const url = `http://localhost:3000/teams/${team_id}/check`; 
     try {
       const response = await fetch(url, {
         method: 'POST',
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ player_id: playerId, team_id }) // Send player_id and team_id to check if bid is possible
+        body: JSON.stringify({ player_id: playerId, team_id }),
       });
 
       const data = await response.json();
       // console.log(data.status);
       if (data.status === "error") {
-        setShowBid(false); // Hide the Bid button if the team cannot afford to bid
+        setShowBid(false); 
         setMessage(data.message || "Insufficient budget to place bid.");
       } else if (data.status === "success") {
-        // setShowBid(true); // Show the Bid button if the team can afford the bid
         setMessage(data.message);
       }
     } catch(error){
@@ -45,15 +43,11 @@ const Team = (props) => {
     }
     }   
 
-    const handleBidResponse = (status, msg) => {
-    // console.log(status);
+    useEffect(() => {
+      checkIfCanBid(playerId);
+    }, [playerId]);
 
-    // if(status==="error"){
-    //   setShowBid(false);
-    // }
-    // else if(status==="success"){
-    //   setShowBid(false);
-    // }
+    const handleBidResponse = (status, msg) => {
     setShowBid(false);
     setMessage(msg);
   }
@@ -62,9 +56,12 @@ const Team = (props) => {
     const url = `http://localhost:3000/teams/${team_id}`;
     try {
       const response = await fetch(url);
-      const jsonPlayers = await response.json();
-      setPlayers(jsonPlayers);
-      // console.log(jsonPlayers);
+      const jsonData = await response.json();
+      setTeamName(jsonData.team[0].team_name);
+      setTeamBudget(jsonData.team[0].team_budget);
+    
+      setPlayers(jsonData.team_players);
+     
     } catch (error) {
       console.log(error);
       
@@ -81,10 +78,12 @@ const Team = (props) => {
   }
 
   return (
+    <div className="wallpaper">
     <div className="playerContainer">
     <div className='players'>
+      <h2>Details for {teamName}</h2>
+      <h2 className='playersHeading'>Budget: {teamBudget}</h2>
       <h2 className='playersHeading'>Players</h2>
-      <h2>Team Details for ID: {team_id}</h2>
       <ul>
       {players.length > 0 ? (
         players.map((player) => (
@@ -110,7 +109,6 @@ const Team = (props) => {
     </div>
 
     <div className='bid'>
-      {/* <h2 className="bidTitle">Lets start bidding.</h2> */}
       {checkIfCanBid(playerId) && showBid ?
       <button className="bidBtn" onClick={handleClick}>{buttonText}</button> :
       null
@@ -121,6 +119,7 @@ const Team = (props) => {
    <h2>{message}</h2>
 }
     </div>  
+    </div>
   )
 }
 
