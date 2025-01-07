@@ -46,7 +46,6 @@ const AddTeam = () => {
 
   return (
     <Fragment>
-        {/* <h1>input todo</h1> */}
        <form className='addTeamForm' action="">
         <label htmlFor="team_name">Teame Name</label>
         <input type="text" name='team_name' onChange={handleChange} value={teamInfo.team_name}/>
