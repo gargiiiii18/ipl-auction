@@ -30,13 +30,6 @@ const handleSubmit = async (event) => {
     });
 
     const data = await response.json();
-    // if(data.status==="success"){
-    //   console.log("redirecting..."); 
-    //   onBidResponse("success", message);
-    
-    //   navigate(`/teams/${team_id}`);
-    //   setBid("");
-    // }
     
     if(data.status==="error"){
      onBidResponse("error", data.message || "Failed to add bid.");
@@ -47,10 +40,8 @@ const handleSubmit = async (event) => {
       console.log("redirecting..."); 
       onBidResponse("success", data.message);
       setEnoughBudgetMsg(data.message);
-      navigate(`/teams/${team_id}`);
       setBid("");
       setBidPlaced(true);
-      window.history.replaceState(null, '', '/');
     }
   } catch (error) {
     console.log(error);
@@ -60,7 +51,6 @@ const handleSubmit = async (event) => {
 
   return (
     <div>
-       {/* <h2>Current Player: {currentPlayer}</h2> */}
        <h2>{enoughBudgetMsg}</h2>
        {!bidPlaced && 
        <form className='bidForm' action="">
