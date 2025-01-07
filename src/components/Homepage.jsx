@@ -62,10 +62,7 @@ const Homepage = () => {
       }
 
       setCurrentPlayer(jsonData[0]);
-      // console.log(jsonData[0].player_name);
       setCurrentPlayerId(jsonData[0].player_id);
-      // const current_player_id = jsonData[0].player_id;
-      // console.log(current_player_id);
     } catch (error) {
       console.log(error);
     }
@@ -84,6 +81,7 @@ const Homepage = () => {
 
   return (
     <Fragment>
+      <div className="wallpaper">
       <div className='heading'>
      <h1>IPL Auction</h1>
      </div>
@@ -105,7 +103,7 @@ const Homepage = () => {
 <WinnerCalculate/>
 }
     </div>
-  
+    </div>
     </Fragment>
   )
 }
