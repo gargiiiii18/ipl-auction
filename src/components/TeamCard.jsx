@@ -1,7 +1,6 @@
 import React from 'react'
 import {Fragment, useEffect, useState} from "react";
 import {useNavigate, Link} from 'react-router-dom';
-// import { loadConfigFromFile } from 'vite'
 const TeamCard = ({currentPlayer}) => {
 
   const [allTeams, setAllTeams] = useState([]);
@@ -14,7 +13,6 @@ const TeamCard = ({currentPlayer}) => {
       const response = await fetch(url);
       const jsonData = await response.json();
       setAllTeams(jsonData);
-      // console.log(jsonData);
   
     } catch (error) {
       console.log(error);
@@ -24,14 +22,10 @@ const TeamCard = ({currentPlayer}) => {
   useEffect(()=>{
     getTeams()
   }, [allTeams, currentPlayer])
-  // console.log(allTeams);
+
 
   const displayTeamInfo = (team_id) =>{
-    // console.log(team_id)>
     navigate(`teams/${team_id}`);
-    // <Link to={`/team/${team_id}`} state={{ currentPlayer }}>
-    //   {team}
-    // </Link>
   }
   
 
@@ -40,7 +34,6 @@ const TeamCard = ({currentPlayer}) => {
         <h2>Teams</h2>
       {
     allTeams.map((team, index)=>(
-      // <Teams name={team.name} budget={team.budget}/>
       <div>
       <li className='teamList' key={team.team_id} onClick={() => displayTeamInfo(team.team_id)}>{team.team_name}</li>
       <span>{team.team_budget}</span> 
