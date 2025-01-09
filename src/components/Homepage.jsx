@@ -86,7 +86,17 @@ const Homepage = () => {
      <h1>IPL Auction</h1>
      </div>
      <div className="teamContainer">
+      <div className="cards">
     <TeamCard currentPlayer={currentPlayer}/>
+    <div className="playerAndResult">
+    {!isClicked &&
+    <PlayerCard currentPlayer={currentPlayer} auctionStarted={auctionStarted} />
+  }
+  {!isClicked && !auctionStarted &&
+<WinnerCalculate/>
+}
+</div>
+  </div>
     <div className="buttons">
     <button onClick={handleClick} className='addTeamBtn'>{buttonText}</button>
 
@@ -94,13 +104,9 @@ const Homepage = () => {
     <button className='endAuctionBtn' onClick={onAuctionEnd}>Get Player</button>
   }
   </div>
-  {!isClicked &&
-    <PlayerCard currentPlayer={currentPlayer} auctionStarted={auctionStarted} />
-  }
+  
       {isClicked &&
     <AddTeam/>
-}{!isClicked && !auctionStarted &&
-<WinnerCalculate/>
 }
     </div>
     </div>
