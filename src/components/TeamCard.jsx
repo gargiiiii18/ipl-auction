@@ -31,13 +31,17 @@ const TeamCard = ({currentPlayer}) => {
 
   return (
     <div className='teamInfo'>
-        <h2>Teams</h2>
+        <h1 className='teamName'>Teams</h1>
+      <h4 className="listHeading">Team<span>Purse Remaining <br/>(cr.)</span></h4>
+     
       {
+        
     allTeams.map((team, index)=>(
-      <div>
+      <div className='teams'>
       <li className='teamList' key={team.team_id} onClick={() => displayTeamInfo(team.team_id)}>{team.team_name}</li>
       <span>{team.team_budget}</span> 
       </div>
+      
     ))
    }
     </div>
