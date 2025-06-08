@@ -64,7 +64,7 @@ If you'd like to contribute to my project, add additional features, etc, please 
 
 1. Clone the repository:
    ```bash
-   git clone <repository_url>
+   git clone https://github.com/gargiiiii18/ipl-auction
    cd ipl-auction
    ```
 
