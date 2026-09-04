@@ -1,52 +1,68 @@
-//Copy the following commands to setup your database
+-- =========================================================
+-- IPL AUCTION ARENA v2 — reference schema (Postgres / Supabase)
+-- The live database was created in the Supabase SQL editor and
+-- evolved via scripts/migrate-*.mjs. This file documents the
+-- complete current schema for a fresh setup.
+-- =========================================================
 
-//CREATE scripts:
+-- Master list of cricketers up for auction (seed via scripts/seed-cricketers.mjs)
+CREATE TABLE IF NOT EXISTS cricketers (
+    cricketer_id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    name         varchar(50)   NOT NULL,
+    role         varchar(20),              -- nullable: enriched later from external data
+    base_price   numeric(10,2) NOT NULL,   -- in crores
+    is_overseas  boolean       NOT NULL DEFAULT false
+);
 
-CREATE DATABASE ipl_auction
-    WITH
-    OWNER = postgres
-    ENCODING = 'UTF8'
-    LC_COLLATE = 'English_India.1252'
-    LC_CTYPE = 'English_India.1252'
-    TABLESPACE = pg_default
-    CONNECTION LIMIT = -1
-    IS_TEMPLATE = False;
+-- Each auction session; host shares room_code, max_lots caps the auction size
+CREATE TABLE IF NOT EXISTS rooms (
+    room_id       uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    room_code     varchar(6) UNIQUE NOT NULL,
+    name          varchar(60) NOT NULL,
+    status        varchar(20) NOT NULL DEFAULT 'lobby',   -- lobby | live | ended
+    max_lots      integer NOT NULL DEFAULT 20,
+    current_cricketer_id integer REFERENCES cricketers(cricketer_id),
+    lot_closes_at timestamptz,
+    created_at    timestamptz NOT NULL DEFAULT now()
+);
 
-CREATE TABLE public.teams
-(
-    team_id integer NOT NULL,
-    team_name character varying(45),
-    team_budget numeric NOT NULL,
-    CONSTRAINT teams_pkey PRIMARY KEY (team_id),
-    CONSTRAINT team_id_unique UNIQUE (team_id)
-)
+-- Human participants (franchises)
+CREATE TABLE IF NOT EXISTS participants (
+    participant_id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    room_id        uuid NOT NULL REFERENCES rooms(room_id) ON DELETE CASCADE,
+    team_name      varchar(45) NOT NULL,
+    budget         numeric(10,2) NOT NULL DEFAULT 100,     -- crores
+    is_host        boolean NOT NULL DEFAULT false,
+    joined_at      timestamptz NOT NULL DEFAULT now(),
+    UNIQUE (room_id, team_name)                            -- one bid identity per room
+);
 
-CREATE TABLE public.players
-(
-    player_id integer NOT NULL,
-    player_name character varying(50),
-    skills character varying(50),
-    price numeric NOT NULL,
-    player_teamid integer,
-    CONSTRAINT players_pkey PRIMARY KEY (player_id)
-)
+-- Current live bid per team per lot (upserted by placeBid; never lowered)
+CREATE TABLE IF NOT EXISTS bids (
+    bid_id         bigserial PRIMARY KEY,
+    room_id        uuid NOT NULL REFERENCES rooms(room_id) ON DELETE CASCADE,
+    cricketer_id   integer NOT NULL REFERENCES cricketers(cricketer_id),
+    participant_id uuid NOT NULL REFERENCES participants(participant_id) ON DELETE CASCADE,
+    amount         numeric(10,2) NOT NULL,
+    created_at     timestamptz NOT NULL DEFAULT now(),
+    UNIQUE (room_id, cricketer_id, participant_id)
+);
 
-CREATE TABLE public.players_bids
-(
-    player_id integer,
-    price numeric,
-    team_id integer,
-    team_budget numeric,
-    bids numeric
-)
+-- Settled sales (squads)
+CREATE TABLE IF NOT EXISTS acquisitions (
+    acquisition_id bigserial PRIMARY KEY,
+    room_id        uuid NOT NULL REFERENCES rooms(room_id) ON DELETE CASCADE,
+    cricketer_id   integer NOT NULL REFERENCES cricketers(cricketer_id),
+    participant_id uuid NOT NULL REFERENCES participants(participant_id) ON DELETE CASCADE,
+    final_price    numeric(10,2) NOT NULL,
+    acquired_at    timestamptz NOT NULL DEFAULT now(),
+    UNIQUE (room_id, cricketer_id)                         -- sold once per room
+);
 
-//insert team and player data in tables teams and players as per choice
-
-INSERT INTO public.teams(
-	team_id, team_name, team_budget)
-	VALUES (?, ?, ?);
-
-INSERT INTO public.players(
-	player_id, player_name, skills, price, player_teamid)
-	VALUES (?, ?, ?, ?, ?);
-
+-- Players who went unsold in a room (excluded from further lots there)
+CREATE TABLE IF NOT EXISTS unsold_cricketers (
+    room_id      uuid NOT NULL REFERENCES rooms(room_id) ON DELETE CASCADE,
+    cricketer_id integer NOT NULL REFERENCES cricketers(cricketer_id),
+    marked_at    timestamptz NOT NULL DEFAULT now(),
+    PRIMARY KEY (room_id, cricketer_id)
+);

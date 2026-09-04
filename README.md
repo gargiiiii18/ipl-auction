@@ -1,103 +1,41 @@
-# IPL Auction
+# IPL Auction Arena 🏏
 
-IPL Auction is a website based game designed to manage and simulate an auction for IPL teams and players. It is a PERN stack project and is purely made-from-total-scratch. The project includes a PostgreSQL database, a React-based frontend, and a Node and Express backend that handles all the necessary logic and data retrieval.
+A live multiplayer IPL auction game. One host creates a room, friends join with a
+6-character code, and cricketers go under the hammer in real time — countdowns,
+live bids, anti-snipe extensions, and ₹100 Cr purses each.
 
-If you'd like to contribute to my project, add additional features, etc, please fork the repository and use a feature branch. Pull requests are warmly welcome.
+## Stack
 
----
+- **Frontend:** React 18 + Vite, Socket.IO client, cricket-themed CSS (no UI framework)
+- **Backend:** Node + Express + Socket.IO, hand-rolled SQL over `pg`
+- **Database:** PostgreSQL (Supabase), 336 real IPL players seeded from `data/player-list.csv`
 
-## Features
+## Run it
 
-- **Teams Management**: Add and manage IPL teams with their budgets.
-- **Players Management**: Display player details such as name, price, and skills.
-- **Auction Functionality**: Teams can bid for players, and the system tracks the highest bid and winning team.
-- **Results Display**: View the results of the auction, including the team that won a specific player.
+```bash
+npm install
+# put your Supabase connection string in .env as DATABASE_URL
+npm run dev          # backend (server/index.js) + frontend (vite) together
+node scripts/run-suite.mjs   # full regression: core rules, sockets, end-to-end auction
+```
 
----
+## Useful scripts
 
-## Screenshots
+| Script | What it does |
+|---|---|
+| `scripts/run-suite.mjs` | starts a fast server, runs all three test suites, cleans up |
+| `scripts/seed-cricketers.mjs` | replaces the player pool from `data/player-list.csv` |
+| `scripts/migrate-3-5.mjs` | applies schema additions (idempotent) |
+| `scripts/test-auction.mjs` | end-to-end auction over sockets (max_lots=4 room) |
 
-## Homepage
-![Home Page](https://github.com/gargiiiii18/ipl-auction/blob/main/src/assets/homepage.png)
+## How a game works
 
-## Adding a team
-<p float="left">
-  <img src="https://github.com/gargiiiii18/ipl-auction/blob/main/src/assets/addintteam1.png" width="45%" />
-  <img src="https://github.com/gargiiiii18/ipl-auction/blob/main/src/assets/addintteam2.png" width="45%" />
-</p>
+1. Host creates a room on the homepage → gets a code like `K7XQ2M`.
+2. Friends join with the code + a team name; every franchise gets ₹100 Cr.
+3. Host opens lots; each cricketer is up for 20 seconds, bids must raise by ₹0.5 Cr,
+   and late bids extend the clock.
+4. Highest bid wins when the timer dies; no bids = unsold.
+5. Auction ends after the host's chosen number of lots — standings and squads are announced.
 
-### Team Details and Adding a bid
-<p float="left">
-  <img src="https://github.com/gargiiiii18/ipl-auction/blob/main/src/assets/team.png" width="45%" />
-  <img src="https://github.com/gargiiiii18/ipl-auction/blob/main/src/assets/addingbid.png" width="45%" />
-</p>
-
-## Result Display and Fund Updation
-<p float="left">
-  <img src="https://github.com/gargiiiii18/ipl-auction/blob/main/src/assets/result.png" width="45%" />
-  <img src="https://github.com/gargiiiii18/ipl-auction/blob/main/src/assets/purseupdation.png" width="45%" />
-</p>
-
-## Tech Stack
-
-### Frontend
-- **React**: For building the user interface.
-- **React Router**: For navigation and routing.
-
-### Backend
-- **Node.js**: For server-side logic.
-- **Express.js**: For handling API routes.
-
-### Database
-- **PostgreSQL**: To store and manage teams, players, and bids data.
-
----
-
-## Setup Instructions
-
-### Prerequisites
-- **Node.js**
-- **PostgreSQL**
-- **npm** or **yarn**
-
-### Steps
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/gargiiiii18/ipl-auction
-   cd ipl-auction
-   ```
-
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-3. Set up the PostgreSQL database:
-   - Install PostgreSQL if not already installed.
-   - Create a database named `ipl_auction`.
-   - Run the provided `setup.sql` file to create the necessary tables and populate initial data:
-     ```bash
-     psql -U <username> -d ipl_auction -f setup.sql
-     ```
-
-4. Start the backend server:
-   ```bash
-   nodemon server.js
-   ```
-
-5. Start the frontend development server:
-   ```bash
-   npm run dev
-   ```
-
-6. Open your browser and navigate to:
-   ```
-   http://localhost:5173
-   ```
-
-
-## Contact
-
-For any inquiries or issues, please contact me on the email mentioned on the profile.
-
+Full schema: `setup.sql`. Server rules live in `server/game.js`, socket wiring in
+`server/sockets.js`. The UI mirrors server events and never invents game state.
