@@ -46,7 +46,7 @@ export async function createRoom({name, hostName, maxLots}){
 export async function getRoomByCode(code){
     const [room] = await query(
         `SELECT * FROM rooms WHERE room_code = $1`,
-        [code.toUpperCase()]
+        [code.trim().toUpperCase()]
     );
     if(!room) return null;
     const participants
