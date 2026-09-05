@@ -139,70 +139,90 @@ export async function startLot(roomId){
     return { room: updated, cricketer };
 };
 
-// The validation ladder — cheap state checks before value checks; every rejection is a
-// GameError the socket layer relays to the single client who needs it.
+// The validation ladder — runs inside a transaction with FOR UPDATE on the room row,
+// so bidding and lot-settlement are fully serialized: a last-second bid either beats
+// the hammer or gets a clean "lot has closed" — never a silent orphan.
 export async function placeBid(roomId, participantId, amount){
-    // ── rung 1: room & lot state ──
-    const [room] = await query(
-        `SELECT * FROM rooms WHERE room_id = $1`,
-        [roomId]
-    );
-    if(!room) throw new GameError("Room not found");
-    if(room.status !== "live") throw new GameError("Auction is not live");
-    if(!room.current_cricketer_id) throw new GameError("No cricketer is on the block");
-    if(new Date(room.lot_closes_at) <= new Date()) throw new GameError("This lot has closed");
+    const client = await pool.connect();   //dedicated connection — required for transactions
+    try {
+        await client.query("BEGIN");
 
-    // ── rung 2: current high bid (MAX of zero rows is NULL → COALESCE to 0) ──
-    const [high] = await query(
-        `SELECT COALESCE(MAX(amount), 0) AS high
-        FROM bids WHERE room_id = $1 AND cricketer_id = $2`,
-        [roomId, room.current_cricketer_id]
-    );
-    const highBid = Number(high.high);
-
-    // ── rung 3: the ladder — beat the high by MIN_INCREMENT, or open at base price ──
-    const [cricketer] = await query(
-        `SELECT * FROM cricketers WHERE cricketer_id = $1`,
-        [room.current_cricketer_id]
-    );
-    const minimum = highBid > 0 ? highBid + MIN_INCREMENT : Number(cricketer.base_price);
-    if(Number(amount) < minimum){
-        throw new GameError(`Bid must be at least ${minimum}`);
-    }
-
-    // ── rung 4: budget ──
-    const [me] = await query(
-        `SELECT budget FROM participants WHERE participant_id = $1`,
-        [participantId]
-    );
-    if(!me) throw new GameError("Participant not found");
-    if(Number(me.budget) < Number(amount)) throw new GameError("Bid exceeds your budget");
-
-    // ── rung 5: upsert own bid — UNIQUE(room_id, cricketer_id, participant_id) means one
-    // bid row per team per lot; the WHERE makes lowering your own bid match zero rows ──
-    const [bid] = await query(
-        `INSERT INTO bids (room_id, cricketer_id, participant_id, amount)
-        VALUES ($1, $2, $3, $4)
-        ON CONFLICT (room_id, cricketer_id, participant_id)
-        DO UPDATE SET amount = EXCLUDED.amount, created_at = now()
-        WHERE bids.amount < EXCLUDED.amount
-        RETURNING *`,
-        [roomId, room.current_cricketer_id, participantId, amount]
-    );
-    if(!bid) throw new GameError("Your new bid must be higher than your previous one");
-
-    // ── rung 6: anti-snipe — late bids push the deadline out; socket layer reschedules ──
-    const msLeft = new Date(room.lot_closes_at) - Date.now();
-    const extended = msLeft < ANTISNIPE_SECONDS * 1000;
-    let currentRoom = room;
-    if(extended){
-        [currentRoom] = await query(
-            `UPDATE rooms SET lot_closes_at = now() + make_interval(secs => $2)
-            WHERE room_id = $1 RETURNING *`,
-            [roomId, ANTISNIPE_SECONDS]
+        //lock the room row; the JOIN pulls the cricketer in the same roundtrip
+        const { rows: roomRows } = await client.query(
+            `SELECT r.*, c.base_price
+            FROM rooms r LEFT JOIN cricketers c ON c.cricketer_id = r.current_cricketer_id
+            WHERE r.room_id = $1 FOR UPDATE OF r`,
+            [roomId]
         );
+        const room = roomRows[0];
+        if(!room) { await client.query("ROLLBACK"); throw new GameError("Room not found"); }
+        if(room.status !== "live") { await client.query("ROLLBACK"); throw new GameError("Auction is not live"); }
+        if(!room.current_cricketer_id) { await client.query("ROLLBACK"); throw new GameError("No cricketer is on the block"); }
+        if(new Date(room.lot_closes_at) <= new Date()) { await client.query("ROLLBACK"); throw new GameError("This lot has closed"); }
+
+        //current high bid (MAX of zero rows is NULL → COALESCE to 0)
+        const { rows: highRows } = await client.query(
+            `SELECT COALESCE(MAX(amount), 0) AS high FROM bids WHERE room_id = $1 AND cricketer_id = $2`,
+            [roomId, room.current_cricketer_id]
+        );
+        const highBid = Number(highRows[0].high);
+
+        //the ladder — beat the high by MIN_INCREMENT, or open at base price
+        const minimum = highBid > 0 ? highBid + MIN_INCREMENT : Number(room.base_price);
+        if(Number(amount) < minimum) {
+            await client.query("ROLLBACK");
+            throw new GameError(`Bid must be at least ${minimum}`);
+        }
+
+        //budget
+        const { rows: meRows } = await client.query(
+            `SELECT budget FROM participants WHERE participant_id = $1`,
+            [participantId]
+        );
+        if(!meRows[0]) { await client.query("ROLLBACK"); throw new GameError("Participant not found"); }
+        if(Number(meRows[0].budget) < Number(amount)) {
+            await client.query("ROLLBACK");
+            throw new GameError("Bid exceeds your budget");
+        }
+
+        //upsert own bid — UNIQUE(room_id, cricketer_id, participant_id) means one bid row
+        //per team per lot; the WHERE makes lowering your own bid match zero rows
+        const { rows: bidRows } = await client.query(
+            `INSERT INTO bids (room_id, cricketer_id, participant_id, amount)
+            VALUES ($1, $2, $3, $4)
+            ON CONFLICT (room_id, cricketer_id, participant_id)
+            DO UPDATE SET amount = EXCLUDED.amount, created_at = now()
+            WHERE bids.amount < EXCLUDED.amount
+            RETURNING *`,
+            [roomId, room.current_cricketer_id, participantId, amount]
+        );
+        if(!bidRows[0]) {
+            await client.query("ROLLBACK");
+            throw new GameError("Your new bid must be higher than your previous one");
+        }
+
+        //anti-snipe — late bids push the deadline out; socket layer reschedules.
+        //inside the lock, so it can never extend an already-settled lot
+        const msLeft = new Date(room.lot_closes_at) - Date.now();
+        const extended = msLeft < ANTISNIPE_SECONDS * 1000;
+        let currentRoom = room;
+        if(extended){
+            const { rows: upRows } = await client.query(
+                `UPDATE rooms SET lot_closes_at = now() + make_interval(secs => $2)
+                WHERE room_id = $1 RETURNING *`,
+                [roomId, ANTISNIPE_SECONDS]
+            );
+            currentRoom = upRows[0];
+        }
+
+        await client.query("COMMIT");
+        return { bid: bidRows[0], previousHigh: highBid, extended, room: currentRoom };
+    } catch (error) {
+        await client.query("ROLLBACK").catch(() => {});
+        throw error;
+    } finally {
+        client.release();   //ALWAYS return the connection to the pool, even on throw
     }
-    return { bid, previousHigh: highBid, extended, room: currentRoom };
 };
 
 // Settles the open lot atomically: winner into acquisitions, budget deducted, lot cleared —
