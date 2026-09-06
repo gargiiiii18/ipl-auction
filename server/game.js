@@ -11,6 +11,10 @@ export class GameError extends Error {}
 export const LOT_DURATION_SECONDS = Number(process.env.LOT_DURATION_SECONDS) || 20;
 export const MIN_INCREMENT = 0.5;
 export const ANTISNIPE_SECONDS = Number(process.env.ANTISNIPE_SECONDS) || 8;
+//bids pressed before the deadline may arrive after it (network + processing latency).
+//the server keeps accepting them for this long past lot_closes_at — otherwise a click
+//at 0.2s-left gets rejected at 0.3s-past, which the user experiences as unfair
+export const BID_GRACE_MS = Number(process.env.BID_GRACE_MS) || 1000;
 
 // code generator function
 function generateRoomCode(){
@@ -158,7 +162,7 @@ export async function placeBid(roomId, participantId, amount){
         if(!room) { await client.query("ROLLBACK"); throw new GameError("Room not found"); }
         if(room.status !== "live") { await client.query("ROLLBACK"); throw new GameError("Auction is not live"); }
         if(!room.current_cricketer_id) { await client.query("ROLLBACK"); throw new GameError("No cricketer is on the block"); }
-        if(new Date(room.lot_closes_at) <= new Date()) { await client.query("ROLLBACK"); throw new GameError("This lot has closed"); }
+        if(new Date(room.lot_closes_at).getTime() + BID_GRACE_MS <= Date.now()) { await client.query("ROLLBACK"); throw new GameError("This lot has closed"); }
 
         //current high bid (MAX of zero rows is NULL → COALESCE to 0)
         const { rows: highRows } = await client.query(

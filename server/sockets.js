@@ -1,6 +1,6 @@
 import {Server} from "socket.io";
 import { query } from "./db.js";
-import { GameError, joinRoom, startLot, placeBid, closeLot } from "./game.js";
+import { GameError, joinRoom, startLot, placeBid, closeLot, BID_GRACE_MS } from "./game.js";
 
 export function initSockets(httpServer){
     const io = new Server(httpServer, {
@@ -12,7 +12,8 @@ export function initSockets(httpServer){
 
     function scheduleLotClose(roomId, closesAt){
         clearTimeout(lotTimers.get(roomId));   //reschedule = cancel the old timer + re-arm
-        const ms = new Date(closesAt) - Date.now() + 250;   //small buffer past the deadline
+        //fire past the deadline + grace window, so an in-flight bid never races the hammer
+        const ms = new Date(closesAt) - Date.now() + BID_GRACE_MS + 250;
         lotTimers.set(roomId, setTimeout(() => fireLotClose(roomId), Math.max(ms, 0)));
     }
 
