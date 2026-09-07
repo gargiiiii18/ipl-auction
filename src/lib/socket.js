@@ -1,14 +1,16 @@
 import { io } from "socket.io-client";
 
-// Same-origin by default — vite proxies /socket.io to the backend in development.
-// Set VITE_API_URL when the backend lives elsewhere (e.g. production deployment).
-const API_BASE = import.meta.env.VITE_API_URL || "";
+// REST calls go through the vercel.json proxy (same origin — see src/lib/api.js).
+// The socket connects DIRECTLY to Render: websocket proxying through Vercel
+// rewrites is unreliable, and point-to-point works flawlessly.
+// Update this URL if the backend is redeployed to a new host.
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || "https://ipl-auction-4zdr.onrender.com";
 
 let socket = null;
 
 export function getSocket() {
   if (!socket) {
-    socket = io(API_BASE || undefined, { autoConnect: false });
+    socket = io(SOCKET_URL, { autoConnect: false });
   }
   return socket;
 }
