@@ -3,7 +3,7 @@
     { "source": "/rooms", "destination": "https://ipl-auction-4zdr.onrender.com/rooms" },
     { "source": "/rooms/:path*", "destination": "https://ipl-auction-4zdr.onrender.com/rooms/:path*" },
     { "source": "/socket.io", "destination": "https://ipl-auction-4zdr.onrender.com/socket.io" },
-    { "source": "/socket.io/:path*", "destination": "https://ipl-auction-4zdr.onrender.com/socket.io/:path*" },
+    { "source": "/socket.io/:path*", "destination": "https://ipl-auction-4zdr.onrender.com/socket.io:path*" },
     { "source": "/((?!rooms|socket.io).*)", "destination": "/index.html" }
   ]
 }
